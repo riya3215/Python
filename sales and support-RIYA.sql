@@ -135,20 +135,22 @@ INSERT INTO `orders` (`ORD_NUM`, `ORD_AMOUNT`, `ADVANCE_AMOUNT`, `ORD_DATE`, `CU
 
 #Segment 1: Database - Tables, Columns, Relationships*/
 
-#1.Identify the tables in the database and their respective columns.
-SHOW COLUMNS FROM agents; -- it Identify all respective columns from agents table. 
+#Q1.Identify the tables in the database and their respective columns.
+-- Ans:
+	SHOW COLUMNS FROM agents; -- it Identify all respective columns from agents table. 
 SHOW COLUMNS FROM customer; -- it Identify all respective columns from customers table.
 SHOW COLUMNS FROM orders; -- it Identify all respective columns from orders table.
 
 
-#2.Determine the number of records in each table within the schema.
-SELECT COUNT(*) FROM agents;
+#Q2.Determine the number of records in each table within the schema.
+-- Ans:
+	SELECT COUNT(*) FROM agents;
 SELECT COUNT(*) FROM customer;
 SELECT COUNT(*) FROM orders;
 
 
-#3.Identify and handle any missing or inconsistent values in the dataset.
-
+#Q3.Identify and handle any missing or inconsistent values in the dataset.
+-- Ans:
 -- a. Missing values in the Agents table: 
 SELECT * FROM agents
  WHERE AGENT_CODE IS NULL OR
@@ -183,8 +185,8 @@ SELECT * FROM orders
  ORD_DESCRIPTION IS NULL;
  
  
- # 4.Analyse the data types of the columns in each table to ensure they are appropriate for the stored data.
- 
+ # Q4.Analyse the data types of the columns in each table to ensure they are appropriate for the stored data.
+ -- Ans:
  -- a. Data types in the Agents table:
 SELECT COLUMN_NAME,
  DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS
@@ -201,8 +203,8 @@ SELECT COLUMN_NAME,
  WHERE TABLE_NAME = 'orders';
  
  
- #5.Identify any duplicate records within the tables and develop a strategy for handling them.
-
+ #Q5.Identify any duplicate records within the tables and develop a strategy for handling them.
+-- Ans:
 -- a.Identify Duplicate records in the Agents table:
 SELECT * FROM agents
  GROUP BY AGENT_CODE
@@ -221,17 +223,18 @@ SELECT * FROM orders
 
 #segment 2:- Basic Sales Analysis
 
-#1.Write SQL queries to retrieve the total number of orders, total revenue, and average order value.
-SELECT COUNT(ORD_NUM) AS TOTAL_NUMBER_OF_ORDERS,
+#Q1.Write SQL queries to retrieve the total number of orders, total revenue, and average order value.
+-- Ans:
+	SELECT COUNT(ORD_NUM) AS TOTAL_NUMBER_OF_ORDERS,
 SUM(ORD_AMOUNT + ADVANCE_AMOUNT) AS TOTAL_REVENUE,
 AVG(ORD_AMOUNT + ADVANCE_AMOUNT) AS AVERAGE_ORDER_VALUE 
 FROM orders;
 
 /*
-#2.The operations team needs to track the agent who has handled the maximum number of high-grade customers.
+#Q2.The operations team needs to track the agent who has handled the maximum number of high-grade customers.
  Write a SQL query to find the agent_name who has the highest count of customers with a grade of 5.
  Display the agent_name and the count of high-grade customers.*/
- 
+ -- Ans:
 SELECT agents.AGENT_NAME,count(customer.GRADE) AS HIGH_GRADE_CUSTOMER FROM customer
  JOIN agents 
  ON customer.AGENT_CODE = agents.AGENT_CODE
@@ -241,9 +244,10 @@ SELECT agents.AGENT_NAME,count(customer.GRADE) AS HIGH_GRADE_CUSTOMER FROM custo
  LIMIT 1;
  
 /* 
- #3.The company wants to identify the most active customer cities in terms of the total order amount.
+ #Q3.The company wants to identify the most active customer cities in terms of the total order amount.
  Write a SQL query to find the top 3 customer cities with the highest total order amount.
  Include cust_city and total_order_amount in the output.*/
+-- Ans:
 SELECT customer.CUST_CITY, SUM(ORD_AMOUNT + ADVANCE_AMOUNT) AS TOTAL_ORDER_AMOUNT
 FROM orders
 JOIN customer ON customer.CUST_CODE = orders.CUST_CODE
@@ -253,31 +257,36 @@ ORDER BY TOTAL_ORDER_AMOUNT DESC LIMIT 3;
 
 #SEGMENT 3:- Segment 3: Customer Analysis:
 
-#1.Calculate the total number of customers.
-SELECT COUNT(*) AS TOTAL_CUSTOMER FROM customer;
+#Q1.Calculate the total number of customers.
+-- Ans:
+	SELECT COUNT(*) AS TOTAL_CUSTOMER FROM customer;
 
-#2.Identify the top-spending customers based on their total order value.
-SELECT customer.CUST_NAME AS CUSTOMER,SUM(ORD_AMOUNT + ADVANCE_AMOUNT) AS TOTAL_ORDER_VALUE FROM customer
+#Q2.Identify the top-spending customers based on their total order value.
+-- Ans:
+	SELECT customer.CUST_NAME AS CUSTOMER,SUM(ORD_AMOUNT + ADVANCE_AMOUNT) AS TOTAL_ORDER_VALUE FROM customer
  JOIN orders
  ON orders.CUST_CODE = customer.CUST_CODE
  GROUP BY CUSTOMER
  ORDER BY TOTAL_ORDER_VALUE DESC
  LIMIT 1;
  
- #3.Analyse customer retention by calculating the percentage of the repeat customers.
-SELECT COUNT(*) AS Repeat_customers,
+ #Q3.Analyse customer retention by calculating the percentage of the repeat customers.
+-- Ans:
+	 SELECT COUNT(*) AS Repeat_customers,
 round(100*COUNT(*)/(SELECT COUNT(*) FROM customer),2) AS Repeat_customer_percentage
 FROM(SELECT CUST_CODE FROM orders
 GROUP BY CUST_CODE
 HAVING COUNT(*)>1) AS Repeat_customers;
 
-#4.Find the name of the customer who has the maximum outstanding amount from every country.
-SELECT CUST_NAME,CUST_COUNTRY,MAX(OUTSTANDING_AMT) AS AMOUNT FROM customer
+#Q4.Find the name of the customer who has the maximum outstanding amount from every country.
+-- Ans:
+	SELECT CUST_NAME,CUST_COUNTRY,MAX(OUTSTANDING_AMT) AS AMOUNT FROM customer
 GROUP BY CUST_COUNTRY,CUST_NAME
 ORDER BY AMOUNT DESC;
 
-#5.Write a SQL query to calculate the percentage of customers in each grade category (1 to 5).
-SELECT GRADE,
+#Q5.Write a SQL query to calculate the percentage of customers in each grade category (1 to 5).
+-- Ans:
+	SELECT GRADE,
 ROUND(100.0 * COUNT(*) / (SELECT COUNT(*) FROM customer), 2) AS percentage
 FROM customer
 GROUP BY grade
@@ -287,9 +296,10 @@ ORDER BY grade;
 #SEGEMENT:- 4 AGENT PERFORMANCE ANALYSIS:
 
 /*
-#1.Company wants to provide a performance bonus to their best agents based on the maximum order amount.
+#Q1.Company wants to provide a performance bonus to their best agents based on the maximum order amount.
  Find the top 5 agents eligible for it*/
- SELECT agents.AGENT_NAME, MAX(orders.ORD_AMOUNT) AS MAX_ORDER_AMOUNT
+ -- Ans:
+	SELECT agents.AGENT_NAME, MAX(orders.ORD_AMOUNT) AS MAX_ORDER_AMOUNT
  FROM agents
  JOIN orders ON agents.AGENT_CODE = orders.AGENT_CODE
  GROUP BY agents.AGENT_NAME
@@ -297,10 +307,11 @@ ORDER BY grade;
  LIMIT 5;
  
  /*
- #2.The company wants to analyse the performance of agents based on the number of orders they have handled.
+ #Q2.The company wants to analyse the performance of agents based on the number of orders they have handled.
  Write a SQL query to rank agents based on the total number of orders they have processed.
  Display agent_name, total_orders, and their respective ranking.*/
- SELECT agents.AGENT_NAME,
+ -- Ans:
+SELECT agents.AGENT_NAME,
  COUNT(orders.ORD_NUM) AS TOTAL_ORDERS,
  RANK() OVER (ORDER BY COUNT(orders.ORD_NUM)DESC) AS Agent_rank 
  FROM agents
@@ -309,12 +320,13 @@ ORDER BY grade;
  GROUP BY agents.AGENT_NAME;
  
  /*
- #3.Company wants to change the commission for the agents, basis advance payment they collected.
+ #Q3.Company wants to change the commission for the agents, basis advance payment they collected.
  Write a sql query which creates a new column updated_commision on the basis below rules.*/
  
 -- If the average advance amount collected is less than 750, there is no change in commission.
 -- If the average advance amount collected is between 750 and 1000 (inclusive), the new commission will be 1.5 times the old commission.
 -- If the average advance amount collected is more than 1000, the new commission will be 2 times the old commission.
+-- Ans:
 ALTER TABLE agents
 		ADD COLUMN updated_commission DECIMAL(10, 2) DEFAULT 0;
 
@@ -340,9 +352,10 @@ SELECT * FROM agents;
 
 #Segment 5: SQL Tasks:
 /*
-#1.Add a new column named avg_rcv_amt in the table customers which contains the average receive amount for every country.
+#Q1.Add a new column named avg_rcv_amt in the table customers which contains the average receive amount for every country.
  Display all columns from the customer table along with the avg_rcv_amt column in the last.*/
- ALTER TABLE customer
+ -- Ans:
+	ALTER TABLE customer
 		ADD COLUMN avg_rcv_amt DECIMAL(12, 2);
 		SET SQL_SAFE_UPDATES = 0;
 		UPDATE customer AS c
@@ -354,9 +367,10 @@ SELECT * FROM agents;
 		SET c.avg_rcv_amt = subquery.avg_receive_amt;
         SELECT * FROM customer; 
  /*
- #2.Write a sql query to create and call a UDF named avg_amt to return the average outstanding 
+ #Q2.Write a sql query to create and call a UDF named avg_amt to return the average outstanding 
  amount of the customers which are managed by a given agent. Also, call the UDF with the agent name ‘Mukesh’.*/
- SET GLOBAL log_bin_trust_function_creators = 1;
+ -- Ans:
+SET GLOBAL log_bin_trust_function_creators = 1;
 DELIMITER //
 CREATE FUNCTION avg_amount(agent_name VARCHAR(40))
 RETURNS INT
@@ -390,11 +404,11 @@ select * from customer;
 SELECT avg_amount('Mukesh') AS average_outstanding_amount;
 
 /*
-#3.Write a sql query to create and call a subroutine called cust_detail to return all the
+#Q3.Write a sql query to create and call a subroutine called cust_detail to return all the
  details of the customer which are having the given grade. 
  Also, call the subroutine with grade 2.*/
  DELIMITER //
-
+-- Ans:
 		CREATE PROCEDURE cust_detail(IN p_grade DECIMAL(10, 0))
 		BEGIN
 			SELECT *
@@ -407,11 +421,11 @@ SELECT avg_amount('Mukesh') AS average_outstanding_amount;
 		CALL cust_detail(2);
         
 /*
-#4.Write a stored procedure sp_name which will return the concatenated ord_num 
+#Q4.Write a stored procedure sp_name which will return the concatenated ord_num 
 (comma separated) of the customer with input customer code using cursor. 
 Also, write the procedure call query with cust_code ‘C00015’.*/
 DELIMITER //
-
+-- Ans:
 		CREATE PROCEDURE s_name(IN p_cust_code VARCHAR(10))
 		BEGIN
 			DECLARE ord_num_list VARCHAR(1000);
